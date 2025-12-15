@@ -9,3 +9,8 @@ gunicorn
 psycopg[binary]
 psycopg2-binary
 python-dotenv
+flask
+flask-cors
+gunicorn
+psycopg[binary]
+python-dotenv
