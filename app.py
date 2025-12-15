@@ -288,6 +288,39 @@ def seed():
         return jsonify({'error': str(e)}), 500
 
 
+# Reset admin password
+@app.route('/api/reset-admin', methods=['GET'])
+def reset_admin():
+    try:
+        conn = get_db()
+        cur = conn.cursor(row_factory=dict_row)
+        
+        # Check if admin user exists
+        cur.execute('SELECT id FROM users WHERE username = %s', ('mamba',))
+        user = cur.fetchone()
+        
+        if user:
+            # Update existing admin password
+            cur.execute(
+                'UPDATE users SET password = %s, has_access = %s, is_admin = %s WHERE username = %s',
+                ('Kaszczyk', True, True, 'mamba'))
+            conn.commit()
+            message = "Admin password reset to default"
+        else:
+            # Create admin user
+            cur.execute(
+                'INSERT INTO users (username, password, has_access, is_admin) VALUES (%s, %s, %s, %s)',
+                ('mamba', 'Kaszczyk', True, True))
+            conn.commit()
+            message = "Admin user created"
+        
+        cur.close()
+        conn.close()
+        return jsonify({'message': message, 'username': 'mamba', 'password': 'Kaszczyk'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # Routes
 @app.route('/api/auth/create-user', methods=['POST'])
 def create_user():
