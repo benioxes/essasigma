@@ -69,8 +69,21 @@ unfold.addEventListener('click', () => {
 var data = {}
 
 var params = new URLSearchParams(window.location.search);
-for (var key of params.keys()){
-  data[key] = params.get(key);
+
+// Check if we have URL params with document data
+if (params.has('name') && params.has('surname')) {
+  // Load from URL params and save to localStorage
+  for (var key of params.keys()){
+    data[key] = params.get(key);
+  }
+  // Save to localStorage for persistence
+  localStorage.setItem('documentData', JSON.stringify(data));
+} else {
+  // Try to load from localStorage
+  var storedData = localStorage.getItem('documentData');
+  if (storedData) {
+    data = JSON.parse(storedData);
+  }
 }
 
 document.querySelector(".id_own_image").style.backgroundImage = `url(${data['image']})`;
