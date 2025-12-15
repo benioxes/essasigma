@@ -1,4 +1,20 @@
 var params = new URLSearchParams(window.location.search);
+
+// Restore params from sessionStorage if URL params are empty but storage has data
+if (!params.toString() && sessionStorage.getItem('docParams')) {
+    params = new URLSearchParams(sessionStorage.getItem('docParams'));
+    // Restore URL without reload if we have stored params
+    if (params.toString()) {
+        var newUrl = window.location.pathname + '?' + params.toString();
+        window.history.replaceState({}, '', newUrl);
+    }
+}
+
+// Save current params to sessionStorage for persistence across navigation
+if (params.toString()) {
+    sessionStorage.setItem('docParams', params.toString());
+}
+
 var ROUTES = {
     home: 'home.html',
     services: 'services.html',
@@ -15,7 +31,12 @@ var ROUTES = {
 };
 
 function sendTo(key){
-    var qs = params.toString();
+    // Always use the most current params (either from URL or restored from storage)
+    var currentParams = new URLSearchParams(window.location.search);
+    if (!currentParams.toString() && sessionStorage.getItem('docParams')) {
+        currentParams = new URLSearchParams(sessionStorage.getItem('docParams'));
+    }
+    var qs = currentParams.toString();
     var file = ROUTES[String(key)] || (String(key).endsWith('.html') ? String(key) : String(key) + '.html');
     var href = file + (qs ? `?${qs}` : '');
     location.href = href;

@@ -1,5 +1,19 @@
-// Pobierz parametry z URL
+// Pobierz parametry z URL lub z sessionStorage
 var params = new URLSearchParams(window.location.search);
+
+// Restore from sessionStorage if URL params are empty
+if (!params.toString() && sessionStorage.getItem('docParams')) {
+    params = new URLSearchParams(sessionStorage.getItem('docParams'));
+    if (params.toString()) {
+        var newUrl = window.location.pathname + '?' + params.toString();
+        window.history.replaceState({}, '', newUrl);
+    }
+}
+
+// Save to sessionStorage
+if (params.toString()) {
+    sessionStorage.setItem('docParams', params.toString());
+}
 
 // Obsługa kliknięcia przycisku login
 document.querySelector(".login").addEventListener('click', () => {
