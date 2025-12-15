@@ -1,17 +1,20 @@
 // Pobierz parametry z URL lub z sessionStorage
 var params = new URLSearchParams(window.location.search);
 
-// Restore from sessionStorage if URL params are empty
-if (!params.toString() && sessionStorage.getItem('docParams')) {
+// Check if we only have access token (not the full document data)
+var hasOnlyAccessToken = params.has('access') && !params.has('name');
+
+// Restore from sessionStorage if URL params are empty or only have access token
+if ((!params.toString() || hasOnlyAccessToken) && sessionStorage.getItem('docParams')) {
     params = new URLSearchParams(sessionStorage.getItem('docParams'));
-    if (params.toString()) {
+    if (params.toString() && params.has('name')) {
         var newUrl = window.location.pathname + '?' + params.toString();
         window.history.replaceState({}, '', newUrl);
     }
 }
 
-// Save to sessionStorage
-if (params.toString()) {
+// Save to sessionStorage (but only if we have real data)
+if (params.toString() && params.has('name')) {
     sessionStorage.setItem('docParams', params.toString());
 }
 
